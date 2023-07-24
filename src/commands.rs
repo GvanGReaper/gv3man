@@ -23,7 +23,8 @@ pub fn handle_command(arg: &Args,state: &AppState){
     let command = &arg.command;
     let flags = &arg.flags;
     if command == "help"{
-        show_help_message();
+        dbg!(arg);
+        show_command_list();
     }
     else if command == "list"{
         list(state,flags);
@@ -36,6 +37,12 @@ pub fn handle_command(arg: &Args,state: &AppState){
     }
     else if command == "empty"{
         empty(state,flags);
+    }
+    else if command == "copy"{
+        copy_command(state, flags);
+    }
+    else if command == "load"{
+        load(state,flags);
     }
     else{
         wrong_command(command);
@@ -194,4 +201,77 @@ fn empty(state: &AppState,flags: &Vec<String>){
 
         }
     }
+}
+
+fn load(state: &AppState,flags: &Vec<String>){
+    check_num_of_flags("load",flags,1,1);
+    let folder_name = flags[0].clone();
+    let parent_path = state.get_setup_dir_path();
+    copy_command(state, &vec![folder_name.clone(),"-t".to_string()]);
+    println!("Loaded modpack {} succesfully!",folder_name);
+}
+
+
+fn copy_command(state: &AppState,flags: &Vec<String>){
+    let parent_path = state.get_setup_dir_path();
+    check_num_of_flags("copy",flags,3,2);
+    let folder_to_copy;
+    let folder_to_write;
+    let final_copy_path;
+    let final_write_path;
+    let mut mode = "-w";
+
+    
+    if flags[0] == "-t"{
+        folder_to_copy = state.get_mc_mods_dir_path();
+        final_copy_path = folder_to_copy;
+    }
+    else{
+        folder_to_copy = flags[0].clone();
+        final_copy_path = format!("{}/mods/{}",parent_path,folder_to_copy);
+    }
+    if flags[1] == "-t"{
+        folder_to_write = state.get_mc_mods_dir_path();
+        final_write_path = folder_to_write;
+    }
+    else{
+        folder_to_write = flags[1].clone();
+        final_write_path = format!("{}/mods/{}",parent_path,folder_to_write);
+    }
+    if flags.len() == 3{
+        check_flags("copy",&vec![flags[2].clone()],&vec!["-w","-a","-e"]);
+        mode = &flags[2];
+    }   
+
+    // dbg!(&final_copy_path,&final_write_path,&mode);
+    
+    for result in Path::new(&final_copy_path).read_dir().expect("ERROR: Couldnt read directory to copy files from"){
+        match result{
+            Err(e)=>{
+                println!("ERROR: failed to open and read contents of directory at: {},\nERROR description: {}",final_copy_path,e);
+                process::exit(1);
+            }
+            Ok(entry)=>{
+                let current_name = entry.file_name();
+                let current_name_str = current_name.to_str().unwrap();
+                let file_to_make = format!("{}/{}",final_write_path,current_name_str);
+                let file_to_copy = format!("{}/{}",final_copy_path,current_name_str);
+                // dbg!(&file_to_copy);
+                let mut new_file = File::create(Path::new(&file_to_make)).expect("ERROR: should have been able to make new file");
+                let mut file_copy_from = File::open(Path::new(&file_to_copy)).expect("Should have been able to read file");
+                // dbg!(file);
+                let res = io::copy(&mut file_copy_from,&mut new_file);
+                match res{
+                    Ok(bytes)=>{
+                        dbg!(bytes);
+                    }
+                    Err(e)=>{
+                        println!("ERROR: {}",e);
+                        process::exit(1);
+                    }
+                }
+            }
+        }
+    }
+
 }

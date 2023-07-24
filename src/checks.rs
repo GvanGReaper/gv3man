@@ -30,11 +30,11 @@ pub fn check_flags(command:&str,flags: &Vec<String>,allowed_flags: &Vec<&str>){
         for flag in allowed_flags{
             println!("{flag}");
         }
-        println!("Arguments provided was/were instead:");
+        println!("Arguments provided were instead:");
         for flag in flags{
             println!("{flag}");
         }
-        println!("For more information give the help command");
+        println!("For more information use the help command");
         process::exit(1);
     }
 }

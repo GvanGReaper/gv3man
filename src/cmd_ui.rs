@@ -6,7 +6,7 @@ fn show_default_message(){
     println!("Please give command: )")
 }
 
-pub fn show_help_message(){
+pub fn show_command_list(){
     println!("LISTING ALL AVAILABLE COMMANDS:");
     println!("[] are required arguments,() are the optional ones");
     println!("| indicates that only one of the two arguments can be given at a time");
@@ -22,12 +22,12 @@ pub fn show_help_message(){
     println!("    -t: Empties tlauncher's mod folder contents.");
     println!("new [mod_pack_name] (path_to_folder)|(flag): Creates new empty modpack folder with mod_pack_name,if path_to_folder is give it copies the contents of that folder instead.If flag is given,modes are:");
     println!("    -t: Creates the new folder with the content being a copy of the content that is in the moment stored in tlauncher's mod folder.");
-    println!("copy [mod_pack_name] [target_name] (mode): Copies the contents of target_name to mod_pack_name.Will create [mod_pack_name] by default if it doesnt exist.Flag has three modes:");
+    println!("copy [target_name] [mod_pack_name] (mode): Copies the contents of target_name to mod_pack_name.Will create [mod_pack_name] by default if it doesnt exist.Flag has three modes:");
     println!("    -w: Completely override existing content(default mode).");
     println!("    -a: Append to alredy existing content.");
     println!("    -e: Error when file doesnt exist instead of creating it.");
     println!("-------------MANAGE MOD LISTS:--------------");
-    println!("activate [mod_pack_name]: Puts mod_pack_name in tlauncher's mods folder");
+    println!("load [mod_pack_name]: Puts mod_pack_name in tlauncher's mods folder");
     println!("--------------------------------------------");
 }
 
@@ -42,4 +42,3 @@ pub fn missing_argument(arg_name: &str){
     println!("Insufficient arguments given.Missing {} argument",arg_name);
     process::exit(1);
 }
-
