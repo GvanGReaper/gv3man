@@ -232,17 +232,19 @@ fn copy_command(state: &AppState,flags: &Vec<String>){
     }
     if flags[1] == "-t"{
         folder_to_write = state.get_mc_mods_dir_path();
+        empty(state,&vec!["-t".to_string()]);
         final_write_path = folder_to_write.clone();
     }
     else{
         folder_to_write = flags[1].clone();
+        empty(state,&vec![folder_to_write.to_string().clone()]);
         final_write_path = format!("{}/mods/{}",parent_path,folder_to_write);
     }
     if flags.len() == 3{
         check_flags("copy",&vec![flags[2].clone()],&vec!["-w","-a","-e"]);
         mode = &flags[2];
     }   
-    empty(state,&vec![folder_to_write.to_string().clone()]);
+    
     // dbg!(&final_copy_path,&final_write_path,&mode);
     
     for result in Path::new(&final_copy_path).read_dir().expect("ERROR: Couldnt read directory to copy files from"){
