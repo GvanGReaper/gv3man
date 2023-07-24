@@ -130,7 +130,7 @@ fn new(state: &AppState,flags: &Vec<String>){
                     let res = io::copy(&mut file_copy_from,&mut new_file);
                     match res{
                         Ok(bytes)=>{
-                            dbg!(bytes);
+                            // dbg!(bytes);
                         }
                         Err(e)=>{
                             println!("ERROR: {}",e);
@@ -263,7 +263,7 @@ fn copy_command(state: &AppState,flags: &Vec<String>){
                 let res = io::copy(&mut file_copy_from,&mut new_file);
                 match res{
                     Ok(bytes)=>{
-                        dbg!(bytes);
+                        //dbg!(bytes);
                     }
                     Err(e)=>{
                         println!("ERROR: {}",e);
