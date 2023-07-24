@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{path::Path, process};
 
 pub fn check_num_of_flags(command:&str,flags: &Vec<String>,max_flag_num: usize,min_flag_num: usize){
     if flags.len() < min_flag_num{
@@ -16,13 +16,25 @@ pub fn check_if_dir_exists(path_str: &str){
     }
 }
 
-pub fn check_flags(flags: &Vec<String>,allowed_flags: &Vec<String>)->bool{
+pub fn check_flags(command:&str,flags: &Vec<String>,allowed_flags: &Vec<&str>){
+    let mut is_recognised = false;
     for flag in flags{
         for current_flag in allowed_flags{
             if flag == current_flag{
-                return true;
+                is_recognised = true;
             }
         }
     }
-    false
+    if !is_recognised{
+        println!("Command's {} flag argument only has {} mode/modes:",command,allowed_flags.len());
+        for flag in allowed_flags{
+            println!("{flag}");
+        }
+        println!("Arguments provided was/were instead:");
+        for flag in flags{
+            println!("{flag}");
+        }
+        println!("For more information give the help command");
+        process::exit(1);
+    }
 }

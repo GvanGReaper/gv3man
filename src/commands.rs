@@ -1,4 +1,4 @@
-use std::fs::{File,create_dir, remove_dir_all,copy};
+use std::fs::{File,create_dir, remove_dir_all,copy, read_dir, ReadDir, remove_file};
 use std::{io, process};
 use std::path::Path;
 
@@ -47,17 +47,28 @@ pub fn handle_command(arg: &Args,state: &AppState){
 
 fn list(state: &AppState,flags: &Vec<String>){
     let parent_path = state.get_setup_dir_path();
+    let tlauncher_path = state.get_mc_mods_dir_path();
+    // dbg!(&tlauncher_path);
     let pack_name;
-    check_num_of_flags("list",flags,1,0);
+    // check_num_of_flags("list",flags,1,0);
+    // if flags.len() > 0{
+    //     check_flags("list",flags,&vec!["-t","-d"]);   
+    // }
+    
+    
     let final_path: String;
     if flags.len() == 0{
         final_path = format!("{}/mods",parent_path);
+    }
+    else if flags[0] == "-t"{
+        final_path = format!("{}",tlauncher_path);
     }
     else{
         pack_name = flags[0].clone();
         final_path = format!("{}/mods/{}",parent_path,pack_name);
     }
     // dbg!(&final_path);
+    
     check_if_dir_exists(&final_path);
     println!("----------------------------START----------------------------");
     for result in Path::new(&final_path).read_dir().expect("Should have been able to open the files"){
@@ -90,7 +101,12 @@ fn new(state: &AppState,flags: &Vec<String>){
     }
     //IF (path_to_folder) is given:
     if flags.len() == 2{
-        path_to_copy_from = flags[1].clone();
+        if flags[1] == "-t"{
+            path_to_copy_from = state.get_mc_mods_dir_path();
+        }
+        else{
+            path_to_copy_from = flags[1].clone();
+        }
         for result in Path::new(&path_to_copy_from).read_dir().expect("Should have been able to open the files"){
             match result{
                 Ok(entry)=>{
@@ -140,5 +156,42 @@ fn delete(state: &AppState,flags: &Vec<String>){
 
 fn empty(state: &AppState,flags: &Vec<String>){
     check_num_of_flags("empty",flags,1,1);     
-    dbg!(flags);  
+    // dbg!(flags);  
+    let parent_path = state.get_setup_dir_path();
+    let tlauncher_path = state.get_mc_mods_dir_path();
+    let final_path;
+    // dbg!(&parent_path);
+
+    if flags[0] == "-t"{
+        final_path = format!("{}",tlauncher_path);
+    }
+    else{
+        let folder_name = flags[0].clone();
+        final_path = format!("{}/mods/{}",parent_path,folder_name);
+    }
+    // dbg!(&final_path);
+    
+   
+    let read_dir_res = read_dir(&final_path);
+    let dir_content;
+    match read_dir_res{
+        Err(e)=>{
+            println!("ERROR while trying to read directory at: {}\nError: {}",final_path,e);
+        }
+        Ok(content)=>{
+            dir_content = content;
+            for file in dir_content{
+                match file {
+                    Ok(entry)=>{
+                        remove_file(entry.path()).expect("Should have been able to remove file");
+                    }
+                    Err(e)=>{
+                        println!("ERROR while trying to read directory at: {}\nError: {}",final_path,e);
+                    }
+                }
+            }
+            // dbg!(dir_content);
+
+        }
+    }
 }
