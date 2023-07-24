@@ -1,5 +1,5 @@
 use std::{env,process};
-use gvmmman::*;
+use gv3man::*;
 
 fn main(){
     let args: Vec<String> = env::args().collect();
